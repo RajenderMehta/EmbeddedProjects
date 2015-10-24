@@ -17,6 +17,47 @@ typedef enum status{
 	FAILURE
 }STATUS;
 
+typedef struct partion_boot_sector{
+	char jmp_instr[3];
+	char oem_name[8];
+	char bpb[25];
+	char ex_bpb[26];
+	char bootstrape_code[448];
+	char end_of_sector[2];	
+}PARTION_BOOT_SECTOR;
+
+typedef struct {
+    unsigned char filename[8];
+    unsigned char ext[3];
+    unsigned char attributes;
+    unsigned char reserved[10];
+    unsigned short modify_time;
+    unsigned short modify_date;
+    unsigned short starting_cluster;
+    unsigned long file_size;
+} __attribute((packed)) Fat16Entry;
+
+typedef struct bpb {
+	char bytes_per_cluster[2];
+	char sectors_per_cluster[1];
+	char reserved_sectors[2];
+	char n_fats[1];
+	char root_entry[2];
+	char small_sectors[2];
+	char media_type[1];
+	char sectors_per_fat[2];
+	char sectors_per_track[2];
+	char n_heads[2];
+	char hidden_sectors[4];
+	char large_sectors[4];
+	char physical_disk_number[1];
+	char current_head[1];
+	char signature[1];
+	char vol_sr_no[4];
+	char volume_label[11];
+	char sys_id[8];
+}BPB;
+
 //Private functions.
 static char sdSpiByte(char data);
 static uint8 sdReadResp(char * buffer, int length);
