@@ -3,11 +3,12 @@
 <!--This file is machine generated and read. It is not intended to be edited by hand.-->
 <!--Due to this, there is no schema for this file.-->
 <CyGuid_2867d519-54d2-4c01-9830-c51cb08bc3dd type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWrkspc" version="5" xml_contents_version="3" name="SDCard_Demo" persistent="" platform="NOT_USED">
-<current_project name=".\RAW SD card.cydsn\RAW SD card.cyprj" />
+<current_project name=".\sd_card_fat32.cydsn\sd_card_fat32.cyprj" />
 <wrkspc_folders />
 <files />
 <projects>
-<v>.\RAW SD card.cydsn\RAW SD card.cyprj</v>
+<v>.\sd_card_fat16.cydsn\sd_card_fat16.cyprj</v>
+<v>.\sd_card_fat32.cydsn\sd_card_fat32.cyprj</v>
 </projects>
 <workspace_id v="f5195ebe-55e8-441c-a607-634d6e7dfc4c" />
 <WriteAppVersionLastSavedWith v="3.1.0.2288" />
