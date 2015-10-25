@@ -1,3 +1,6 @@
+Date: 25 Oct, 2015
+    Created delete file batch script, and working on FAT32 drivers.
+    
 Date: 24 Oct, 2015
 
    Understanding.
