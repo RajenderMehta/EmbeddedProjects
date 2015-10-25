@@ -17,10 +17,28 @@ typedef enum status{
 	FAILURE
 }STATUS;
 
-typedef struct bpb {
+typedef struct partion_boot_sector{
 	char jmp_instr[3];
 	char oem_name[8];
-	char bytes_per_sector[2];
+	char bpb[25];
+	char ex_bpb[26];
+	char bootstrape_code[448];
+	char end_of_sector[2];	
+}PARTION_BOOT_SECTOR;
+
+typedef struct {
+    unsigned char filename[8];
+    unsigned char ext[3];
+    unsigned char attributes;
+    unsigned char reserved[10];
+    unsigned short modify_time;
+    unsigned short modify_date;
+    unsigned short starting_cluster;
+    unsigned long file_size;
+} __attribute((packed)) Fat16Entry;
+
+typedef struct bpb {
+	char bytes_per_cluster[2];
 	char sectors_per_cluster[1];
 	char reserved_sectors[2];
 	char n_fats[1];
@@ -32,39 +50,13 @@ typedef struct bpb {
 	char n_heads[2];
 	char hidden_sectors[4];
 	char large_sectors[4];
-	char large_sector_per_fat[4];
-	char ext_flags[2];
-	char fs_version[2];
-	char root_dir_start[4];
-	char fs_info_sector[2];
-	char backup_boot_sector[2];
-	char reserved[12];
-	char nPartitions[1];
-	char unused[1];
-	char exntd_sign[1];
-	char partion_sr_no[4];
-	char partition_name[11];
-	char fat_name[8];
+	char physical_disk_number[1];
+	char current_head[1];
+	char signature[1];
+	char vol_sr_no[4];
+	char volume_label[11];
+	char sys_id[8];
 }BPB;
-
-typedef struct partion_boot_sector{
-	char bpb[sizeof(BPB)];
-	char bootstrape_code[420];
-	char end_of_sector[2];	
-}PARTION_BOOT_SECTOR;
-
-/*
-typedef struct {
-    unsigned char filename[8];
-    unsigned char ext[3];
-    unsigned char attributes;
-    unsigned char reserved[10];
-    unsigned short modify_time;
-    unsigned short modify_date;
-    unsigned short starting_cluster;
-    unsigned long file_size;
-} __attribute((packed)) Fat16Entry;
-*/
 
 //Private functions.
 static char sdSpiByte(char data);
