@@ -17,7 +17,7 @@ char Read_buffer_1[0x200], Read_buffer_2[0x200];
 	
 void sys_init() {
 	int status = 0;
-	//Set SD card clock to 10 MHz.
+	//Set SD card clock to 10 KHz.
 	Clock_1_SetDivider(39);			//Source clock 400KHz. Divider setting 39 (+ 1)
 	
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
@@ -27,7 +27,7 @@ void sys_init() {
 	//Not able to init SD card.
 	assert(status == 0);
 	
-	//Boost the SD card clocks to 100 MHz.
+	//Boost the SD card clocks to 100 KHz.
 	Clock_1_SetDivider(3);			//Source clock 400KHz. Divider setting 3 (+ 1).
 }
 

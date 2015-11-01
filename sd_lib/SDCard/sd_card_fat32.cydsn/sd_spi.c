@@ -132,24 +132,24 @@ int SD_init() {
 	if(res == 0)
 		return -1;	//Failure.
 	
-	
-	res = 1000;
+	res = 100;
 	do {
-		sdSendCommand(0x1, 0x0);
+		sdSendCommand(8, 0x1AA);
 		i = sdSpiByte(0xff);
 		res--;
-	} while((i != 0) & (res != 0));
+	} while((i != 1) & (res != 0));
 	
 	if(res == 0)
 		return -1;	//Failure.
+     
 	
 	// Optional: CMD8 - Just validating the legal command for card type.
-	sdCommandAndResponse(8, 0x000001AA);
+	//sdCommandAndResponse(8, 0x000001AA);
 	
 	// Card Init. Series of CMD_55 and CMD_41
 	do {	
 		sdCommandAndResponse(55, 0x0);
-    	sdCommandAndResponse(41, 0x0);
+    	sdCommandAndResponse(41, 0x40000000);
 	} while(resp[0] != 0);
 
 	// Optional: CMD_58 - Check voltage compatiblity.
@@ -165,6 +165,7 @@ int SD_init() {
 	//Success.
 	return 0;
 }
+
 uint32 SD_Sector_Read(void * Read_buffer ,uint32  sec_num) {
 	// CMD_17 - Dump the sector.
 	sdCommandAndResponse(17, sec_num << 9);
