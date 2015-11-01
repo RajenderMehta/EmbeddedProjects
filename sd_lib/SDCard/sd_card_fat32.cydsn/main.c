@@ -38,7 +38,7 @@ void SD_test() {
 	PARTION_BOOT_SECTOR * p_pbs;
 	BPB * p_bpb;
 	Fat16Entry * p_fe;
-/*
+
 	//initiate data pattern.
 	for (j =0; j < 0x200; j++) {
 		Read_buffer_1[j] = (char)j;
@@ -53,7 +53,7 @@ void SD_test() {
 		else 
 			fail++;
 	}
-*/
+
 	SD_Sector_Read(Read_buffer_1, 0);
 	
 	p_pbs = (void *)Read_buffer_1;

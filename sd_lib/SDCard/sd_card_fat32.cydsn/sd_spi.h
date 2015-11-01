@@ -53,7 +53,6 @@ typedef struct partion_boot_sector{
 	char end_of_sector[2];	
 }PARTION_BOOT_SECTOR;
 
-/*
 typedef struct {
     unsigned char filename[8];
     unsigned char ext[3];
@@ -64,7 +63,6 @@ typedef struct {
     unsigned short starting_cluster;
     unsigned long file_size;
 } __attribute((packed)) Fat16Entry;
-*/
 
 //Private functions.
 static char sdSpiByte(char data);
