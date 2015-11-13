@@ -1,6 +1,15 @@
 #ifndef _FAT32_H_
 #define _FAT32_H_
 
+#include "project.h"
+
+typedef struct fat_info {
+	uint32 fat_begin;
+	uint32 cluster_begin;
+	uint32 sectors_per_clusters;
+	uint32 root_cluster;
+} FAT_INFO;
+
 typedef struct bpb {
 	char jmp_instr[3];
 	char oem_name[8];
