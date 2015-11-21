@@ -21,8 +21,10 @@ void SD_test() {
 	uint32 root_dir_sector;
 	PARTION_BOOT_SECTOR * p_pbs;
 	BPB * p_bpb;
-	Fat16Entry * p_fe;
-	FAT_INFO * f_info;
+	FAT_INFO * fat_info;
+	FILE_ENTRY * file_info;
+	uint32 file_data_sector;
+
 	//initiate data pattern.
 	for (j =0; j < 0x200; j++) {
 		Read_buffer_1[j] = (char)j;
@@ -43,21 +45,36 @@ void SD_test() {
 	p_pbs = (PARTION_BOOT_SECTOR *)Read_buffer_1;
 	p_bpb = (BPB*)(p_pbs->bpb);
 	
-	assert(*(uint16 *)(p_bpb->bytes_per_sector) == 512);
-	assert(*(uint8 *)(p_bpb->n_fats) == 2);
+	assert(p_bpb->BPB_BytsPerSec == 512);
+	assert(p_bpb->BPB_NumFATs == 2);
 
-	f_info = (FAT_INFO *)malloc(sizeof(f_info));
+	fat_info = (FAT_INFO *) malloc(sizeof(FAT_INFO));
 
-	f_info->fat_begin = *(uint16 *)(p_bpb->reserved_sectors);
-	f_info->cluster_begin = f_info->fat_begin + ((*(uint8 *)(p_bpb->n_fats))*(*(uint16 *)(p_bpb->sectors_per_fat)));
-	f_info->sectors_per_clusters = *(uint8 *)p_bpb->sectors_per_cluster;
-	f_info->root_cluster = *(uint32 *)p_bpb->root_dir_start;
+	fat_info->fat_begin = p_bpb->BPB_RsvdSecCnt + p_bpb->BPB_RootEntCnt; 
+	fat_info->cluster_begin = fat_info->fat_begin + (p_bpb->BPB_NumFATs * p_bpb->BPB_FATSz32 ); 
+	fat_info->root_cluster = p_bpb->BPB_RootClus;
+	fat_info->sectors_per_clusters = p_bpb->BPB_SecPerClus;
+
+	SD_Sector_Read(Read_buffer_1, fat_info->cluster_begin);
+
+	assert(sizeof(FILE_ENTRY)==32);
+
+	file_info = (void *)Read_buffer_1;
+
+	//temp file code.
+	while (file_info->cluster_low != 0x5) {
+		file_info++;
+	}
 	
+	//Get file data now.
+	file_data_sector = fat_info->cluster_begin + ((file_info->cluster_low) - (fat_info->root_cluster))*(fat_info->sectors_per_clusters);
+
+	SD_Sector_Read(Read_buffer_1, file_data_sector);
+
 	while(1);
 }
 
-int main()
-{	
+int main() {
 	//Global interrupt enable.
 	/*CyGlobalIntEnable;*/
 	sys_init();

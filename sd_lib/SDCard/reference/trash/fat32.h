@@ -10,51 +10,51 @@ typedef struct fat_info {
 	uint32 root_cluster;
 } FAT_INFO;
 
+#pragma pack(1)			//__packed for ARMCC.
 typedef struct bpb {
-	char jmp_instr[3];
-	char oem_name[8];
-	char bytes_per_sector[2];
-	char sectors_per_cluster[1];
-	char reserved_sectors[2];
-	char n_fats[1];
-	char root_entry[2];
-	char small_sectors[2];
-	char media_type[1];
-	char sectors_per_fat[2];
-	char sectors_per_track[2];
-	char n_heads[2];
-	char hidden_sectors[4];
-	char large_sectors[4];
-	char large_sector_per_fat[4];
-	char ext_flags[2];
-	char fs_version[2];
-	char root_dir_start[4];
-	char fs_info_sector[2];
-	char backup_boot_sector[2];
-	char reserved[12];
-	char nPartitions[1];
-	char unused[1];
-	char exntd_sign[1];
-	char partion_sr_no[4];
-	char partition_name[11];
-	char fat_name[8];
+	char BS_jmpBoot[3];
+	char BS_OEMName[8];
+	uint16 BPB_BytsPerSec;
+	uint8 BPB_SecPerClus;
+	uint16 BPB_RsvdSecCnt;
+	uint8 BPB_NumFATs;
+	uint16 BPB_RootEntCnt;
+	uint16 BPB_TotSec16;
+	uint8 BPB_Media;
+	uint16 BPB_FATSz16;
+	uint16 BPB_SecPerTrk;
+	uint16 BPB_NumHeads;
+	uint32 BPB_HiddSec;
+	uint32 BPB_TotSec32;
+	uint32 BPB_FATSz32;
+	uint16 BPB_ExtFlags;
+	uint16 BPB_FSVer;
+	uint32 BPB_RootClus;
+	uint16 BPB_FSInfo;
+	uint16 BPB_BkBootSec;
+	char BPB_Reserved[12];
+	uint8 BS_DrvNum;
+	char BS_Reserved1[1];
+	char BS_BootSig[1];
+	uint32 BS_VolID;
+	char BS_VolLab[11];
+	char BS_FilSysType[8];
 }BPB;
+
+typedef struct file_info{
+	char short_file_name[11];
+	uint8 att;
+	char reserved[8];
+	uint16 cluster_high;
+	uint32 reserved_1;
+	uint16 cluster_low;
+	uint32 file_size;
+}FILE_ENTRY;
 
 typedef struct partion_boot_sector{
 	char bpb[sizeof(BPB)];
 	char bootstrape_code[420];
 	char end_of_sector[2];	
 }PARTION_BOOT_SECTOR;
-
-typedef struct {
-    unsigned char filename[8];
-    unsigned char ext[3];
-    unsigned char attributes;
-    unsigned char reserved[10];
-    unsigned short modify_time;
-    unsigned short modify_date;
-    unsigned short starting_cluster;
-    unsigned long file_size;
-} Fat16Entry;
 
 #endif
