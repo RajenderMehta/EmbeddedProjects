@@ -10,8 +10,12 @@
  * ========================================
 */
 #include <project.h>
+#include "pff.h"
 #include "sd_spi.h"
 #include "assert.h"
+
+//#include <stdio.h>
+
 
 char Read_buffer_1[0x200], Read_buffer_2[0x200];
 	
@@ -35,10 +39,7 @@ void SD_test() {
 	int j = 0;
 	volatile int pass = 0, fail = 0;
 	uint32 root_dir_sector;
-	PARTION_BOOT_SECTOR * p_pbs;
-	BPB * p_bpb;
-	Fat16Entry * p_fe;
-
+	
 	//initiate data pattern.
 	for (j =0; j < 0x200; j++) {
 		Read_buffer_1[j] = (char)j;
@@ -53,39 +54,26 @@ void SD_test() {
 		else 
 			fail++;
 	}
-
-	SD_Sector_Read(Read_buffer_1, 0);
-	
-	p_pbs = (void *)Read_buffer_1;
-	p_bpb = p_pbs->bpb;
-	
-	root_dir_sector = *(uint16 *)p_bpb->reserved_sectors + (*(uint16 *)(p_bpb->sectors_per_fat)) * (*(uint16 *)(p_bpb->n_fats));
-	
-	SD_Sector_Read(Read_buffer_1, root_dir_sector);
-	
-	p_fe = Read_buffer_1;
-	
-	//file listing.
-	while(strcmp((char *)(p_fe->filename), "") != 0) {
-		p_fe++;
-	}
-	
+		
 	while(1);
 }
-
+   
 int main()
-{	
+{
+	FATFS fs;
+	UINT br;
+    char rd_buff[0x1e] = {0};
+
 	//Global interrupt enable.
 	/*CyGlobalIntEnable;*/
-	sys_init();
 	
-	//Testing sd card init. Will corrupt the file system. 
-	SD_test();
-			
-    for(;;)
-    {
-        /* Place your application code here. */
-    }
+    /* Open a text file and type it */
+	if (pf_mount(&fs) == FR_OK &&
+		pf_open("HELLO.TXT") == FR_OK) {
+    		pf_read(rd_buff, 0x1e, &br);	/* Direct output to the console */
+	}
+
+	for (;;) ;
 }
 
 /* [] END OF FILE */

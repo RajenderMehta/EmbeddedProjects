@@ -140,7 +140,7 @@ int SD_init() {
 	} while((i != 1) & (res != 0));
 	
 	if(res == 0)
-		return -1;	//Failure.
+		return SD_TIMEOUT;	//Failure.
      
 	
 	// Optional: CMD8 - Just validating the legal command for card type.
@@ -163,7 +163,7 @@ int SD_init() {
 	sdReadResp_nBytes(resp, 20);
 	
 	//Success.
-	return 0;
+	return SD_OK;
 }
 
 uint32 SD_Sector_Read(void * Read_buffer ,uint32  sec_num) {
