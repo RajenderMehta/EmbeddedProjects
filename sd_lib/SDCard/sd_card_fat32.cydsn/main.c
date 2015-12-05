@@ -16,7 +16,6 @@
 
 //#include <stdio.h>
 
-
 char Read_buffer_1[0x200], Read_buffer_2[0x200];
 	
 void sys_init() {
@@ -38,7 +37,8 @@ void sys_init() {
 void SD_test() {
 	int j = 0;
 	volatile int pass = 0, fail = 0;
-	uint32 root_dir_sector;
+
+	sys_init();
 	
 	//initiate data pattern.
 	for (j =0; j < 0x200; j++) {
@@ -66,6 +66,8 @@ int main()
 
 	//Global interrupt enable.
 	/*CyGlobalIntEnable;*/
+	
+	//SD_test();
 	
     /* Open a text file and type it */
 	if (pf_mount(&fs) == FR_OK &&

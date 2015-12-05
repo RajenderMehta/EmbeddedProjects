@@ -18,6 +18,7 @@ DSTATUS disk_initialize (void)
     Clock_1_SetDivider(39); 
     
     SPIM_Start();
+	
     /* If Initialization Succeeded */
     if( !SD_init())
     {
