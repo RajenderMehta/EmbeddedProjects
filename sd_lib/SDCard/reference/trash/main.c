@@ -9,27 +9,11 @@
  *
  * ========================================
 */
-#include <project.h>
+#include "project.h"
 #include "sd_spi.h"
 #include "assert.h"
 
 char Read_buffer_1[0x200], Read_buffer_2[0x200];
-	
-void sys_init() {
-	int status = 0;
-	//Set SD card clock to 10 MHz.
-	Clock_1_SetDivider(39);			//Source clock 400KHz. Divider setting 39 (+ 1)
-	
-    /* Place your initialization/startup code here (e.g. MyInst_Start()) */
-	SPIM_Start();
-	status = SD_init();
-	
-	//Not able to init SD card.
-	assert(status == 0);
-	
-	//Boost the SD card clocks to 100 MHz.
-	Clock_1_SetDivider(3);			//Source clock 400KHz. Divider setting 3 (+ 1).
-}
 
 void SD_test() {
 	int j = 0;
@@ -37,13 +21,15 @@ void SD_test() {
 	uint32 root_dir_sector;
 	PARTION_BOOT_SECTOR * p_pbs;
 	BPB * p_bpb;
-	Fat16Entry * p_fe;
-/*
+	FAT_INFO * fat_info;
+	FILE_ENTRY * file_info;
+	uint32 file_data_sector;
+
 	//initiate data pattern.
 	for (j =0; j < 0x200; j++) {
 		Read_buffer_1[j] = (char)j;
 	}
-	
+	/*
 	for (j =0; j < 100; j++) {
 		SD_Sector_Write(Read_buffer_1, j);
 		SD_Sector_Read(Read_buffer_2, j);
@@ -53,28 +39,42 @@ void SD_test() {
 		else 
 			fail++;
 	}
-*/
+	*/
 	SD_Sector_Read(Read_buffer_1, 0);
 	
-	p_pbs = (void *)Read_buffer_1;
-	p_bpb = p_pbs->bpb;
+	p_pbs = (PARTION_BOOT_SECTOR *)Read_buffer_1;
+	p_bpb = (BPB*)(p_pbs->bpb);
 	
-	root_dir_sector = *(uint16 *)p_bpb->reserved_sectors + (*(uint16 *)(p_bpb->sectors_per_fat)) * (*(uint16 *)(p_bpb->n_fats));
-	
-	SD_Sector_Read(Read_buffer_1, root_dir_sector);
-	
-	p_fe = Read_buffer_1;
-	
-	//file listing.
-	while(strcmp((char *)(p_fe->filename), "") != 0) {
-		p_fe++;
+	assert(p_bpb->BPB_BytsPerSec == 512);
+	assert(p_bpb->BPB_NumFATs == 2);
+
+	fat_info = (FAT_INFO *) malloc(sizeof(FAT_INFO));
+
+	fat_info->fat_begin = p_bpb->BPB_RsvdSecCnt + p_bpb->BPB_RootEntCnt; 
+	fat_info->cluster_begin = fat_info->fat_begin + (p_bpb->BPB_NumFATs * p_bpb->BPB_FATSz32 ); 
+	fat_info->root_cluster = p_bpb->BPB_RootClus;
+	fat_info->sectors_per_clusters = p_bpb->BPB_SecPerClus;
+
+	SD_Sector_Read(Read_buffer_1, fat_info->cluster_begin);
+
+	assert(sizeof(FILE_ENTRY)==32);
+
+	file_info = (void *)Read_buffer_1;
+
+	//temp file code.
+	while (file_info->cluster_low != 0x5) {
+		file_info++;
 	}
 	
+	//Get file data now.
+	file_data_sector = fat_info->cluster_begin + ((file_info->cluster_low) - (fat_info->root_cluster))*(fat_info->sectors_per_clusters);
+
+	SD_Sector_Read(Read_buffer_1, file_data_sector);
+
 	while(1);
 }
 
-int main()
-{	
+int main() {
 	//Global interrupt enable.
 	/*CyGlobalIntEnable;*/
 	sys_init();

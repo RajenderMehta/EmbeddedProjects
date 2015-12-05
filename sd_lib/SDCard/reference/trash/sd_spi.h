@@ -9,12 +9,13 @@
  *
  * ========================================
 */
-#include <project.h>
+#include "project.h"
 #define len(x) (sizeof(x)/sizeof(x[0]))
 
-#define SD_OK       (0)
-#define SD_ERROR    (-1)
-#define SD_TIMEOUT  (-2)
+typedef enum status{
+	PASS = 0,
+	FAILURE
+}STATUS;
 
 //Private functions.
 static char sdSpiByte(char data);
@@ -28,4 +29,5 @@ static void sdCommandAndResponse(char cmd, uint32 param);
 uint32 SD_Sector_Read(void * Read_buffer, uint32  sec_num);
 uint32 SD_Sector_Write(void * Write_buffer ,uint32  sec_num);
 int SD_init();
+void sys_init();
 /* [] END OF FILE */
