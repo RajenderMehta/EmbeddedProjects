@@ -16,7 +16,6 @@
 
 //#include <stdio.h>
 
-
 char Read_buffer_1[0x200], Read_buffer_2[0x200];
 	
 void sys_init() {
@@ -29,7 +28,7 @@ void sys_init() {
 	status = SD_init();
 	
 	//Not able to init SD card.
-	assert(status == 0);
+	//assert(status == 0);
 	
 	//Boost the SD card clocks to 100 KHz.
 	Clock_1_SetDivider(3);			//Source clock 400KHz. Divider setting 3 (+ 1).
@@ -38,7 +37,8 @@ void sys_init() {
 void SD_test() {
 	int j = 0;
 	volatile int pass = 0, fail = 0;
-	uint32 root_dir_sector;
+
+	sys_init();
 	
 	//initiate data pattern.
 	for (j =0; j < 0x200; j++) {
@@ -66,6 +66,8 @@ int main()
 
 	//Global interrupt enable.
 	/*CyGlobalIntEnable;*/
+	
+	SD_test();
 	
     /* Open a text file and type it */
 	if (pf_mount(&fs) == FR_OK &&
