@@ -17,12 +17,12 @@
 #define SD_TIMEOUT  (-2)
 
 //Private functions.
-static char sdSpiByte(char data);
-static uint8 sdReadResp(char * buffer, int length);
-static void sdReadResp_nBytes(char * buff, uint32 nBytes);
-static char sdCrc7(char* chr,char cnt,char crc);
-static void sdSendCommand(char cmd, uint32 param);
-static void sdCommandAndResponse(char cmd, uint32 param);
+static uint8 sdSpiByte(uint8 data);
+static uint8 sdReadResp(uint8 * buffer, int length);
+static void sdReadResp_nBytes(uint8 * buff, uint32 nBytes);
+static uint8 sdCrc7(uint8* chr,uint8 cnt,uint8 crc);
+static void sdSendCommand(uint8 cmd, uint32 param);
+static void sdCommandAndResponse(uint8 cmd, uint32 param);
 
 //Global functions.
 uint32 SD_Sector_Read(void * Read_buffer, uint32  sec_num);

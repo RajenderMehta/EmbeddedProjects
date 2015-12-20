@@ -11,17 +11,17 @@
 */
 #include "sd_spi.h"
 
-char send[6]; 
-char resp[20];
+uint8 send[6]; 
+uint8 resp[20];
 
 //Private functions.
-static char sdSpiByte(char data){
+static uint8 sdSpiByte(uint8 data){
      SPIM_WriteTxData(data);
      //while(!(ssp1stat & (1<<BF)));
      return SPIM_ReadRxData();
 } 
-static uint8 sdReadResp(char * buffer, int length){ 
-    char v;
+static uint8 sdReadResp(uint8 * buffer, int length){ 
+    uint8 v;
 	int i = 0; 
 	int j = 0;
 	
@@ -40,8 +40,8 @@ static uint8 sdReadResp(char * buffer, int length){
      
 	return i;
 }
-static void sdReadResp_nBytes(char * buff, uint32 nBytes){ 
-    char v;
+static void sdReadResp_nBytes(uint8 * buff, uint32 nBytes){ 
+    uint8 v;
 	int i = 0;
 	int j = 0;
 	
@@ -54,8 +54,8 @@ static void sdReadResp_nBytes(char * buff, uint32 nBytes){
     } 
 }
 
-static void sdWrite_Sector(char * buff, uint32 nBytes){ 
-    char v;
+static void sdWrite_Sector(uint8 * buff, uint32 nBytes){ 
+    uint8 v;
 	int i = 0;
 	int j = 0;
 	
@@ -74,9 +74,9 @@ static void sdWrite_Sector(char * buff, uint32 nBytes){
 	
 }
 
-static char sdCrc7(char* chr,char cnt,char crc){ 
-     char i, a; 
-     char Data; 
+static uint8 sdCrc7(uint8* chr,uint8 cnt,uint8 crc){ 
+     uint8 i, a; 
+     uint8 Data; 
 
      for(a = 0; a < cnt; a++){           
           Data = chr[a];           
@@ -88,7 +88,7 @@ static char sdCrc7(char* chr,char cnt,char crc){
      }      
      return crc & 0x7F; 
 } 
-static void sdSendCommand(char cmd, uint32 param){      
+static void sdSendCommand(uint8 cmd, uint32 param){      
      
      send[0] = cmd | 0x40; 
      send[1] = param >> 24; 
@@ -101,17 +101,18 @@ static void sdSendCommand(char cmd, uint32 param){
           send[cmd] = sdSpiByte(send[cmd]); 
      } 
 } 
-static void sdCommandAndResponse(char cmd, uint32 param){   
-     char ret;          
-     ret = sdSpiByte(0xFF); 
-     sdSendCommand(cmd, param); 
+
+static void sdCommandAndResponse(uint8 cmd, uint32 param){   
+	uint8 ret;          
+	ret = sdSpiByte(0xFF); 
+	sdSendCommand(cmd, param); 
      sdReadResp(resp, len(resp));     
-     return;
+	return;
 }
 
 //Global functions.
 int SD_init() {
-    char i = 0;
+    uint8 i = 0;
 	int res = -1;
        
 	//Pin_1_Write(1);

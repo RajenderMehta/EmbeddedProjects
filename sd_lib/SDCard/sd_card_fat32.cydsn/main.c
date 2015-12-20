@@ -28,7 +28,7 @@ void sys_init() {
 	status = SD_init();
 	
 	//Not able to init SD card.
-	assert(status == 0);
+	//assert(status == 0);
 	
 	//Boost the SD card clocks to 100 KHz.
 	Clock_1_SetDivider(3);			//Source clock 400KHz. Divider setting 3 (+ 1).
@@ -67,7 +67,7 @@ int main()
 	//Global interrupt enable.
 	/*CyGlobalIntEnable;*/
 	
-	//SD_test();
+	SD_test();
 	
     /* Open a text file and type it */
 	if (pf_mount(&fs) == FR_OK &&
