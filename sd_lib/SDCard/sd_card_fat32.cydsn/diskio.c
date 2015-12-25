@@ -4,6 +4,7 @@
 
 #include "diskio.h"
 #include "sd_spi.h"
+#include "pffconf.h"
 
 extern char Read_buffer_1[0x200];
 /*-----------------------------------------------------------------------*/
@@ -36,70 +37,9 @@ DSTATUS disk_initialize (void)
 	return stat;
 }
 
-
-#if 0
 /*-----------------------------------------------------------------------*/
 /* Read Partial Sector                                                   */
 /*-----------------------------------------------------------------------*/
-
-DRESULT disk_readp (
-	BYTE* buff,		/* Pointer to the destination object */
-	DWORD sector,	/* Sector number (LBA) */
-	UINT offset,	/* Offset in the sector */
-	UINT count		/* Byte count (bit15:destination) */
-)
-{
-	DRESULT res;
-	BYTE rc;
-	UINT bc;
-    uint8 temp = 0;
-
-	sector *= 512;	/* Convert to byte address if needed */
-
-	res = RES_ERROR;
-//	if (send_cmd(CMD17, sector) == 0) {	/* READ_SINGLE_BLOCK */
-
-//    if (sdSendCommand(17, (int) sector) == 0) {
-       sdSendCommand(17, (int) sector);
-		bc = 40000;	/* Time counter */
-		do {				/* Wait for data packet */
-		//	rc = rcv_spi();
-            rc = sdSpiByte(0xFF);
-		} while (rc != 0xFE && --bc);  // Ignore the responce( which is 0) before 0xFE
-
-		if (rc == 0xFE) {	/* A data packet arrived */
-
-			bc = 512 + 2 - offset - count;	/* Number of trailing bytes to skip */
-
-			/* Skip leading bytes */
-			//while (offset--) rcv_spi();
-
-            while (offset--)
-                temp = sdSpiByte(0xFF); 
-            
-			/* Receive a part of the sector */
-			if (buff) {	/* Store data to the memory */
-				do {
-                    //*buff++ = rcv_spi();
-        //            *buff++ = sdSpiByte(0xFF);
-                                 temp = sdSpiByte(0xFF);
-                                *buff++ = temp;
-				} while (--count);
-			}
-
-			/* Skip trailing bytes and CRC */
-			//do rcv_spi(); while (--bc);
-            do sdSpiByte(0xFF); while (--bc);
-            
-			res = RES_OK;
-		}
-
-	//rcv_spi(); // dont know why we need this
-
-	return res;
-}
-
-#else
 
 DRESULT disk_readp (
 	BYTE* buff,		/* Pointer to the destination object */
@@ -119,36 +59,35 @@ DRESULT disk_readp (
     return RES_OK;
 }
 
-#endif
 /*-----------------------------------------------------------------------*/
-/* Write Partial Sector                                                  */
+/* Write partial sector                                                  */
 /*-----------------------------------------------------------------------*/
-#if 0
+
+#if _USE_WRITE
 DRESULT disk_writep (
-	const BYTE* buff,		/* Pointer to the data to be written, NULL:Initiate/Finalize write operation */
-	DWORD sc		/* Sector number (LBA) or Number of bytes to send */
+	const BYTE *buff,	/* Pointer to the bytes to be written (NULL:Initiate/Finalize sector write) */
+	DWORD sc			/* Number of bytes to send, Sector number (LBA) or zero */
 )
 {
 	DRESULT res;
+	volatile static uint32 sec_n;
 
-
-	if (!buff) {
-		if (sc) {
-
-			// Initiate write process
-
-		} else {
-
-			// Finalize write process
+	if (buff) {		/* Send data bytes */
+		SD_Sector_Read(Read_buffer_1, sec_n);
+		memcpy(Read_buffer_1, (void *)buff, sc);
+		SD_Sector_Write(Read_buffer_1, sec_n);		
+		res = RES_OK;
+	}
+	else {
+		if (sc) {	/* Initiate sector write process */
+			sec_n = sc;	
+			res = RES_OK;
+		}
+		else {	/* Finalize sector write process */
 
 		}
-	} else {
-
-		// Send data to the disk
-
 	}
 
 	return res;
 }
-
 #endif
